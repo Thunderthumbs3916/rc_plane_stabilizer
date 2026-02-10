@@ -11,3 +11,12 @@ float TXInput(){
   }
   return pulseLength;
 }
+
+float stickIncrement() {
+  float tx = TXInput();        // 1000–2000 µs
+  float centered = tx - 1500;  // -500 → +500
+
+  if (abs(centered) < 20) return 0;  // deadband
+
+  return centered * 0.002;   // degrees per loop(200ms)
+}

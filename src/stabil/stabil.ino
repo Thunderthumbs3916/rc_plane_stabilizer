@@ -17,6 +17,7 @@ void initServo();
 float TXInput();
 void passThrough();
 float rollInputVal();
+float stickIncrement();
 unsigned long pulseLength;
 float error, correction, servoCmd;
 float Kp=2.0;
@@ -36,27 +37,8 @@ void loop() {
   pulseLength = pulseIn(RX_AILERON, HIGH, 30000);
   roll = getRoll();
   Serial.println("Accelerometer: " + String(roll) + " " + String(roll-setRollPoint) + " TX Input: " + TXInput());
-  //angle hold from direct input from TX, centre of tx means plane level
 
-  // setRollPoint = rollInputVal();
-
-  // error = setRollPoint - roll;
-  // correction = -error * Kp;
-  // servoCmd = SERVO_ZERO + correction;
-  // servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
-  // aileron.write(servoCmd);
-
-  // Serial.println(
-  //  "Roll:" + String(roll) +
-  //  " Set:" + String(setRollPoint) +
-  //  " Err:" + String(error) +
-  //  " Servo:" + String(servoCmd)
-  // );
-  // delay(20);
-
-
-
-  // Roll hold with pilot comand set point
+  // Roll hold with pilot command set point
 
   stickMove = stickIncrement(); // scaled TX signal
 
@@ -77,13 +59,22 @@ void loop() {
   servoCmd = SERVO_ZERO + correction;
   servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
   aileron.write(servoCmd);
-}
 
-float stickIncrement() {
-  float tx = TXInput();        // 1000–2000 µs
-  float centered = tx - 1500;  // -500 → +500
+  //angle hold from direct input from TX, centre of tx means plane level
 
-  if (abs(centered) < 20) return 0;  // deadband
+  // setRollPoint = rollInputVal();
 
-  return centered * 0.002;   // degrees per loop
+  // error = setRollPoint - roll;
+  // correction = -error * Kp;
+  // servoCmd = SERVO_ZERO + correction;
+  // servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
+  // aileron.write(servoCmd);
+
+  // Serial.println(
+  //  "Roll:" + String(roll) +
+  //  " Set:" + String(setRollPoint) +
+  //  " Err:" + String(error) +
+  //  " Servo:" + String(servoCmd)
+  // );
+  // delay(20);
 }
