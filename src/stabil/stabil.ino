@@ -35,19 +35,27 @@ void loop() {
   pulseLength = pulseIn(RX_AILERON, HIGH, 30000);
   roll = getRoll();
   Serial.println("Accelerometer: " + String(roll) + " " + String(roll-setRollPoint) + " TX Input: " + TXInput());
-  setRollPoint = rollInputVal();
+  //angle hold from direct input from TX, centre of tx means plane level
 
-  error = setRollPoint - roll;
-  correction = -error * Kp;
-  servoCmd = SERVO_ZERO + correction;
-  servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
-  aileron.write(servoCmd);
+  // setRollPoint = rollInputVal();
 
-  Serial.println(
-    "Roll:" + String(roll) +
-    " Set:" + String(setRollPoint) +
-    " Err:" + String(error) +
-    " Servo:" + String(servoCmd)
-  );
-  delay(20);
+  // error = setRollPoint - roll;
+  // correction = -error * Kp;
+  // servoCmd = SERVO_ZERO + correction;
+  // servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
+  // aileron.write(servoCmd);
+
+  // Serial.println(
+  //  "Roll:" + String(roll) +
+  //  " Set:" + String(setRollPoint) +
+  //  " Err:" + String(error) +
+  //  " Servo:" + String(servoCmd)
+  // );
+  // delay(20);
+
+
+
+  // Roll hold with pilot coman set point, can do rolls
+  
+
 }
