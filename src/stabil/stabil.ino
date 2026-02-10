@@ -19,8 +19,9 @@ void passThrough();
 float rollInputVal();
 unsigned long pulseLength;
 float error, correction, servoCmd;
-float Kp=1.0;
+float Kp=2.0;
 float roll;
+float stickMove;
 
 void setup() {
   //initialization
@@ -55,7 +56,34 @@ void loop() {
 
 
 
-  // Roll hold with pilot coman set point, can do rolls
-  
+  // Roll hold with pilot comand set point
 
+  stickMove = stickIncrement(); // scaled TX signal
+
+  if(stickMove != 0){
+      // Pilot wants to move
+      setRollPoint += stickMove;      // increment roll setpoint
+      setRollPoint = constrain(setRollPoint, -90, 90); // optional limit
+  }
+
+  // Always read roll
+  roll = getRoll();
+
+  // P controller
+  error = setRollPoint - roll;
+  correction = error * Kp;
+
+  // Send servo
+  servoCmd = SERVO_ZERO + correction;
+  servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
+  aileron.write(servoCmd);
+}
+
+float stickIncrement() {
+  float tx = TXInput();        // 1000–2000 µs
+  float centered = tx - 1500;  // -500 → +500
+
+  if (abs(centered) < 20) return 0;  // deadband
+
+  return centered * 0.002;   // degrees per loop
 }
