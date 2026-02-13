@@ -18,5 +18,5 @@ float stickIncrement() {
 
   if (abs(centered) < 20) return 0;  // deadband
 
-  return centered * 0.002;   // degrees per loop(200ms)
+  return centered * 0.002;   // degrees per loop(20ms)
 }

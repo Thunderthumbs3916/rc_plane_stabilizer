@@ -76,5 +76,5 @@ void loop() {
   //  " Err:" + String(error) +
   //  " Servo:" + String(servoCmd)
   // );
-  // delay(20);
+  delay(20);
 }
