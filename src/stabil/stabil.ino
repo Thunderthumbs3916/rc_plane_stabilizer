@@ -5,9 +5,10 @@
 const int SERVO_PIN = 23;
 const float SERVO_ZERO = 90.0;
 const float SERVOTHROW = 50.0;
-const float SERVO_RIGHT_MAX = 0.0+SERVOTHROW;
-const float SERVO_LEFT_MAX = 180.0-SERVOTHROW;
+const float SERVO_RIGHT_MAX = SERVO_ZERO + SERVOTHROW;
+const float SERVO_LEFT_MAX = SERVO_ZERO - SERVOTHROW;
 const int RX_AILERON = 13;
+const int RX_SWITCH = 12;
 //declaration
 Servo aileron;
 float setRollPoint;
@@ -18,9 +19,9 @@ float TXInput();
 void passThrough();
 float rollInputVal();
 float stickIncrement();
-unsigned long pulseLength;
+unsigned long pulseLength, pulseLength2;
 float error, correction, servoCmd;
-float Kp=2.0;
+float Kp=1;
 float roll;
 float stickMove;
 
@@ -31,34 +32,38 @@ void setup() {
   setRollPoint = getRoll();
   initServo();
   pinMode(RX_AILERON, INPUT);
+  pinMode(RX_SWITCH, INPUT);
 }
 
 void loop() {
   pulseLength = pulseIn(RX_AILERON, HIGH, 30000);
+  pulseLength2 = pulseIn(RX_SWITCH, HIGH, 30000);
+  //Serial.println("Accelerometer: " + String(roll) + " " + String(roll-setRollPoint) + " TX Input: " + TXInput());
+  if (pulseLength2 > 1500) Serial.println("1"); else Serial.println("0");
   roll = getRoll();
-  Serial.println("Accelerometer: " + String(roll) + " " + String(roll-setRollPoint) + " TX Input: " + TXInput());
+  if (stickIncrement() != 0){
+    passThrough();
+  }else{
+    if (pulseLength2 > 1500){
+     // P controller
+      error = setRollPoint - roll;
+      correction = error * Kp;
 
-  // Roll hold with pilot command set point
-
-  stickMove = stickIncrement(); // scaled TX signal
-
-  if(stickMove != 0){
-      // Pilot wants to move
-      setRollPoint += stickMove;      // increment roll setpoint
-      setRollPoint = constrain(setRollPoint, -90, 90); // optional limit
+      // Send servo
+      servoCmd = SERVO_ZERO + correction;
+      servoCmd = constrain(servoCmd, SERVO_LEFT_MAX, SERVO_RIGHT_MAX);
+      //Serial.println(
+      //"Roll: " + String(roll) +
+      //" Set: " + String(setRollPoint) +
+      //" Err: " + String(error) +
+      //" Servo: " + String(servoCmd)
+    //);
+      aileron.write(servoCmd);
+      }else{
+        passThrough();
+      }
   }
 
-  // Always read roll
-  roll = getRoll();
-
-  // P controller
-  error = setRollPoint - roll;
-  correction = error * Kp;
-
-  // Send servo
-  servoCmd = SERVO_ZERO + correction;
-  servoCmd = constrain(servoCmd, SERVO_RIGHT_MAX, SERVO_LEFT_MAX);
-  aileron.write(servoCmd);
 
   //angle hold from direct input from TX, centre of tx means plane level
 
