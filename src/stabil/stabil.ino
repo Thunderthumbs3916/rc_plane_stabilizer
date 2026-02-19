@@ -43,9 +43,10 @@ void loop() {
   roll = getRoll();
   if (stickIncrement() != 0){
     passThrough();
+    setRollPoint = roll;
   }else{
     if (pulseLength2 > 1500){
-     // P controller
+      // P controller
       error = setRollPoint - roll;
       correction = error * Kp;
 
@@ -57,10 +58,11 @@ void loop() {
       //" Set: " + String(setRollPoint) +
       //" Err: " + String(error) +
       //" Servo: " + String(servoCmd)
-    //);
+      //);
       aileron.write(servoCmd);
       }else{
         passThrough();
+        setRollPoint = roll;
       }
   }
 
